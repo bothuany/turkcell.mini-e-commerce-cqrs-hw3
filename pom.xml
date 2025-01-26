@@ -9,9 +9,9 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.turkcell</groupId>
-	<artifactId>mini-e-commere-hw2</artifactId>
+	<artifactId>mini-e-commere-cqrs-hw3</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>mini-e-commere-hw2</name>
+	<name>mini-e-commere-cqrs-hw3</name>
 	<description>Demo project for Spring Boot</description>
 	<url/>
 	<licenses>
@@ -104,6 +104,11 @@
 			<version>3.2.2</version>
 		</dependency>
 
+		<dependency>
+			<groupId>net.sizovs</groupId>
+			<artifactId>pipelinr</artifactId>
+			<version>0.9</version>
+		</dependency>
 	</dependencies>
 
 	<build>

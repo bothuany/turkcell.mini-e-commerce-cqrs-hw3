@@ -1,0 +1,36 @@
+package com.turkcell.mini_e_commere_cqrs_hw3.application.commands.auth;
+
+import an.awesome.pipelinr.Command;
+import com.turkcell.mini_e_commere_cqrs_hw3.domain.entity.User;
+import com.turkcell.mini_e_commere_cqrs_hw3.domain.service.domain.*;
+import com.turkcell.mini_e_commere_cqrs_hw3.dto.user.AuthUserDto;
+import com.turkcell.mini_e_commere_cqrs_hw3.util.exception.type.BusinessException;
+import com.turkcell.mini_e_commere_cqrs_hw3.util.jwt.JwtService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Component;
+
+import static com.turkcell.mini_e_commere_cqrs_hw3.domain.service.domain.UserService.getRoles;
+
+@Component
+@RequiredArgsConstructor
+public class LoginCommandHandler implements Command.Handler<LoginCommand, AuthUserDto>{
+    private final UserService userService;
+    private final JwtService jwtService;
+    private final PasswordEncoder passwordEncoder;
+
+    @Override
+    public AuthUserDto handle(LoginCommand loginCommand) {
+        User dbUser = userService.getByUsername(loginCommand.getUsername());
+
+        boolean isPasswordCorrect = passwordEncoder
+                .matches(loginCommand.getPassword(), dbUser.getPassword());
+
+        if(!isPasswordCorrect)
+            throw new BusinessException("Invalid or wrong credentials.");
+
+        AuthUserDto authUserDto = new AuthUserDto();
+        authUserDto.setToken(this.jwtService.generateToken(dbUser.getUsername(), getRoles(dbUser)));
+        return authUserDto;
+    }
+}
