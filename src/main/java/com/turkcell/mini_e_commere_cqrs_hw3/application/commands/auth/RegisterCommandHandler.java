@@ -5,11 +5,11 @@ import com.turkcell.mini_e_commere_cqrs_hw3.domain.entity.*;
 import com.turkcell.mini_e_commere_cqrs_hw3.domain.repository.AdminRepository;
 import com.turkcell.mini_e_commere_cqrs_hw3.domain.repository.CustomerRepository;
 import com.turkcell.mini_e_commere_cqrs_hw3.domain.repository.SellerRepository;
-import com.turkcell.mini_e_commere_cqrs_hw3.domain.service.domain.*;
+import com.turkcell.mini_e_commere_cqrs_hw3.domain.service.OperationClaimService;
 import com.turkcell.mini_e_commere_cqrs_hw3.dto.user.AuthUserDto;
-import com.turkcell.mini_e_commere_cqrs_hw3.rules.OperationClaimBusinessRules;
+import com.turkcell.mini_e_commere_cqrs_hw3.enums.OperationClaims;
 import com.turkcell.mini_e_commere_cqrs_hw3.rules.UserBusinessRules;
-import com.turkcell.mini_e_commere_cqrs_hw3.util.jwt.JwtService;
+import com.turkcell.mini_e_commere_cqrs_hw3.core.jwt.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.turkcell.mini_e_commere_cqrs_hw3.domain.service.domain.UserService.getRoles;
+import static com.turkcell.mini_e_commere_cqrs_hw3.domain.service.UserService.getRoles;
 
 @Component
 @RequiredArgsConstructor
@@ -36,15 +36,12 @@ public class RegisterCommandHandler implements Command.Handler<RegisterCommand, 
     public AuthUserDto handle(RegisterCommand registerCommand) {
         userBusinessRules.usernameMustNotExist(registerCommand.getUsername());
 
-        if (registerCommand instanceof RegisterAdminCommand) {
-            return registerAdmin((RegisterAdminCommand) registerCommand);
-        } else if (registerCommand instanceof RegisterCustomerCommand) {
-            return registerCustomer((RegisterCustomerCommand) registerCommand);
-        } else if (registerCommand instanceof RegisterSellerCommand) {
-            return registerSeller((RegisterSellerCommand) registerCommand);
-        } else {
-            throw new RuntimeException("Unknown register command type");
-        }
+        return switch (registerCommand) {
+            case RegisterAdminCommand registerAdminCommand -> registerAdmin(registerAdminCommand);
+            case RegisterCustomerCommand registerCustomerCommand -> registerCustomer(registerCustomerCommand);
+            case RegisterSellerCommand registerSellerCommand -> registerSeller(registerSellerCommand);
+            default -> throw new RuntimeException("Unknown register command type");
+        };
     }
 
     private AuthUserDto registerSeller(RegisterSellerCommand registerCommand) {
@@ -52,10 +49,10 @@ public class RegisterCommandHandler implements Command.Handler<RegisterCommand, 
         seller.setPassword(passwordEncoder.encode(registerCommand.getPassword()));
 
         // Set seller role
-        operationClaimService.addIfNotExistsOperationClaim("seller");
+        operationClaimService.addIfNotExistsOperationClaim(OperationClaims.seller.name());
 
         List<OperationClaim> claims = new ArrayList<>();
-        claims.add(operationClaimService.getOperationClaimByName("seller"));
+        claims.add(operationClaimService.getOperationClaimByName(OperationClaims.seller.name()));
         seller.setOperationClaims(claims);
 
         sellerRepository.save(seller);
@@ -70,10 +67,10 @@ public class RegisterCommandHandler implements Command.Handler<RegisterCommand, 
         customer.setPassword(passwordEncoder.encode(registerCommand.getPassword()));
 
         // Set customer role
-        operationClaimService.addIfNotExistsOperationClaim("customer");
+        operationClaimService.addIfNotExistsOperationClaim(OperationClaims.customer.name());
 
         List<OperationClaim> claims = new ArrayList<>();
-        claims.add(operationClaimService.getOperationClaimByName("customer"));
+        claims.add(operationClaimService.getOperationClaimByName(OperationClaims.customer.name()));
         customer.setOperationClaims(claims);
 
         customerRepository.save(customer);
@@ -88,10 +85,10 @@ public class RegisterCommandHandler implements Command.Handler<RegisterCommand, 
         admin.setPassword(passwordEncoder.encode(registerCommand.getPassword()));
 
         // Set admin role
-        operationClaimService.addIfNotExistsOperationClaim("admin");
+        operationClaimService.addIfNotExistsOperationClaim(OperationClaims.admin.name());
 
         List<OperationClaim> claims = new ArrayList<>();
-        claims.add(operationClaimService.getOperationClaimByName("admin"));
+        claims.add(operationClaimService.getOperationClaimByName(OperationClaims.admin.name()));
         admin.setOperationClaims(claims);
 
         adminRepository.save(admin);
@@ -100,5 +97,4 @@ public class RegisterCommandHandler implements Command.Handler<RegisterCommand, 
 
         return authUserDto;
     }
-
 }

@@ -2,11 +2,14 @@ package com.turkcell.mini_e_commere_cqrs_hw3.controller;
 
 import an.awesome.pipelinr.Pipeline;
 import com.turkcell.mini_e_commere_cqrs_hw3.application.commands.category.delete.DeleteCategoryCommand;
+import com.turkcell.mini_e_commere_cqrs_hw3.application.queries.category.getall.GetAllCategoriesQuery;
+import com.turkcell.mini_e_commere_cqrs_hw3.application.queries.category.getall.GetCategoryTreeQuery;
+import com.turkcell.mini_e_commere_cqrs_hw3.application.queries.category.getall.GetSubCategoriesQuery;
+import com.turkcell.mini_e_commere_cqrs_hw3.application.queries.category.getbyid.GetCategoryById;
 import com.turkcell.mini_e_commere_cqrs_hw3.core.web.BaseController;
 import com.turkcell.mini_e_commere_cqrs_hw3.dto.category.CategoryListingDto;
 import com.turkcell.mini_e_commere_cqrs_hw3.application.commands.category.create.CreateCategoryCommand;
 import com.turkcell.mini_e_commere_cqrs_hw3.application.commands.category.update.UpdateCategoryCommand;
-import com.turkcell.mini_e_commere_cqrs_hw3.domain.service.application.CategoryApplicationService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,11 +20,8 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/categories")
 public class CategoryController extends BaseController {
-    private final CategoryApplicationService categoryApplicationService;
-
-    public CategoryController(Pipeline pipeline, CategoryApplicationService categoryApplicationService) {
+    public CategoryController(Pipeline pipeline) {
         super(pipeline);
-        this.categoryApplicationService = categoryApplicationService;
     }
 
     @PostMapping
@@ -48,25 +48,25 @@ public class CategoryController extends BaseController {
 
     @GetMapping
     public ResponseEntity<List<CategoryListingDto>> getAllCategories() {
-        List<CategoryListingDto> categories = categoryApplicationService.getAll();
-        return ResponseEntity.ok(categories);
+        GetAllCategoriesQuery query = new GetAllCategoriesQuery();
+        return ResponseEntity.ok(query.execute(pipeline));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<CategoryListingDto> getCategoryById(@PathVariable Integer id) {
-        CategoryListingDto category = categoryApplicationService.getById(id);
-        return ResponseEntity.ok(category);
+        GetCategoryById query = new GetCategoryById(id);
+        return ResponseEntity.ok(query.execute(pipeline));
     }
 
     @GetMapping("/{id}/subcategories")
     public ResponseEntity<List<CategoryListingDto>> getSubCategories(@PathVariable Integer id) {
-        List<CategoryListingDto> subCategories = categoryApplicationService.getAllSubCategories(id);
-        return ResponseEntity.ok(subCategories);
+        GetSubCategoriesQuery query = new GetSubCategoriesQuery(id);
+        return ResponseEntity.ok(query.execute(pipeline));
     }
 
     @GetMapping("/tree")
     public ResponseEntity<List<CategoryListingDto>> getCategoryTree() {
-        List<CategoryListingDto> categoryTree = categoryApplicationService.getCategoryTree();
-        return ResponseEntity.ok(categoryTree);
+        GetCategoryTreeQuery query = new GetCategoryTreeQuery();
+        return ResponseEntity.ok(query.execute(pipeline));
     }
 }

@@ -5,8 +5,6 @@ import com.turkcell.mini_e_commere_cqrs_hw3.domain.entity.Cart;
 import com.turkcell.mini_e_commere_cqrs_hw3.domain.entity.CartItem;
 import com.turkcell.mini_e_commere_cqrs_hw3.domain.repository.CartItemRepository;
 import com.turkcell.mini_e_commere_cqrs_hw3.domain.repository.CartRepository;
-import com.turkcell.mini_e_commere_cqrs_hw3.domain.service.domain.CartItemService;
-import com.turkcell.mini_e_commere_cqrs_hw3.domain.service.domain.CartService;
 import com.turkcell.mini_e_commere_cqrs_hw3.rules.CartBusinessRules;
 import com.turkcell.mini_e_commere_cqrs_hw3.rules.ProductBusinessRules;
 import lombok.RequiredArgsConstructor;
@@ -19,14 +17,14 @@ import java.math.BigDecimal;
 public class RemoveFromCartCommandHandler implements Command.Handler<RemoveFromCartCommand, Void> {
     private final CartRepository cartRepository;
     private final CartItemRepository cartItemRepository;
-    private final CartService cartService;
     private final CartBusinessRules cartBusinessRules;
     private final ProductBusinessRules productBusinessRules;
     @Override
-    public Void handle(RemoveFromCartCommand removeFromCartCommand) {
-        int cartId = cartService.getCartIdByUserId(removeFromCartCommand.getUserId());
-        int cartItemId = removeFromCartCommand.getCartItemId();
-        int quantity = removeFromCartCommand.getQuantity();
+    public Void handle(RemoveFromCartCommand command) {
+        int cartId = cartRepository.findByUserId(command.getUserId())
+                .orElseThrow(() -> new RuntimeException("Cart not found")).getId();
+        int cartItemId = command.getCartItemId();
+        int quantity = command.getQuantity();
 
         cartBusinessRules.cartIdMustExist(cartId);
         cartBusinessRules.cartItemMustExist(cartItemId);

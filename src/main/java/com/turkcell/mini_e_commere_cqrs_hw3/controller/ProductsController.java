@@ -4,9 +4,11 @@ import an.awesome.pipelinr.Pipeline;
 import com.turkcell.mini_e_commere_cqrs_hw3.application.commands.product.create.CreateProductCommand;
 import com.turkcell.mini_e_commere_cqrs_hw3.application.commands.product.delete.DeleteProductCommand;
 import com.turkcell.mini_e_commere_cqrs_hw3.application.commands.product.update.UpdateProductCommand;
+import com.turkcell.mini_e_commere_cqrs_hw3.application.queries.product.getall.GetAllProductsQuery;
+import com.turkcell.mini_e_commere_cqrs_hw3.application.queries.product.getall.GetFilteredProductsQuery;
+import com.turkcell.mini_e_commere_cqrs_hw3.application.queries.product.getbyid.GetProductByIdQuery;
 import com.turkcell.mini_e_commere_cqrs_hw3.core.web.BaseController;
 import com.turkcell.mini_e_commere_cqrs_hw3.dto.product.ProductListingDto;
-import com.turkcell.mini_e_commere_cqrs_hw3.domain.service.application.ProductApplicationService;
 import jakarta.annotation.Nullable;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -19,11 +21,9 @@ import java.util.List;
 @RestController()
 @RequestMapping("/api/v1/products")
 public class ProductsController extends BaseController {
-    private final ProductApplicationService productApplicationService;
 
-    public ProductsController(Pipeline pipeline, ProductApplicationService productApplicationService) {
+    public ProductsController(Pipeline pipeline) {
         super(pipeline);
-        this.productApplicationService = productApplicationService;
     }
 
     @PostMapping
@@ -44,14 +44,21 @@ public class ProductsController extends BaseController {
 
     @GetMapping
     public ResponseEntity<List<ProductListingDto>> getAll() {
-        return ResponseEntity.ok(this.productApplicationService.getAll());
+        GetAllProductsQuery query = new GetAllProductsQuery();
+        return ResponseEntity.ok(query.execute(pipeline));
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<ProductListingDto> getById(@PathVariable Integer id) {
+        GetProductByIdQuery query = new GetProductByIdQuery(id);
+        return ResponseEntity.ok(query.execute(pipeline));
+    }
     @GetMapping("/search")
     public ResponseEntity<List<ProductListingDto>> search(@RequestParam @Nullable String categoryId,
                                                           @RequestParam @Nullable BigDecimal minPrice,
                                                           @RequestParam @Nullable BigDecimal maxPrice,
                                                           @RequestParam @Nullable Boolean inStock) {
-        return ResponseEntity.ok(this.productApplicationService.search(categoryId, minPrice, maxPrice, inStock));
+        GetFilteredProductsQuery query = new GetFilteredProductsQuery(categoryId, minPrice, maxPrice, inStock);
+        return ResponseEntity.ok(query.execute(pipeline));
     }
 }

@@ -30,4 +30,3 @@ public class RegisterCommand implements Command<AuthUserDto> {
     @Pattern(regexp = ".*[A-Z].*", message = "Password must contain at least one uppercase letter")
     private String password;
 }
-

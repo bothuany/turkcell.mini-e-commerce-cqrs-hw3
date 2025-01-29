@@ -11,7 +11,7 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
     showSql: true
     hibernate:
-      ddlAuto: create
+      ddlAuto: update
 server:
   port: 8080
 jwt:

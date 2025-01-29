@@ -13,7 +13,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class RemoveFromCartCommand implements Command<Void> {
     @NotNull(message = "Product ID cannot be null")
-    private Integer cartItemId ;
+    private Integer cartItemId;
     @NotNull(message = "Quantity cannot be null")
     @Min(value = 1, message = "Quantity must be greater than 0")
     private Integer quantity;

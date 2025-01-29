@@ -4,9 +4,10 @@ import an.awesome.pipelinr.Pipeline;
 import com.turkcell.mini_e_commere_cqrs_hw3.application.commands.order.create.CreateOrderCommand;
 import com.turkcell.mini_e_commere_cqrs_hw3.application.commands.order.delete.DeleteOrderCommand;
 import com.turkcell.mini_e_commere_cqrs_hw3.application.commands.order.update.UpdateOrderStateCommand;
+import com.turkcell.mini_e_commere_cqrs_hw3.application.queries.order.getall.GetUsersAllOrdersQuery;
+import com.turkcell.mini_e_commere_cqrs_hw3.application.queries.order.getbyid.GetOrderByIdQuery;
 import com.turkcell.mini_e_commere_cqrs_hw3.core.web.BaseController;
 import com.turkcell.mini_e_commere_cqrs_hw3.dto.order.OrderListingDto;
-import com.turkcell.mini_e_commere_cqrs_hw3.domain.service.application.OrderApplicationService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -19,11 +20,9 @@ import java.util.UUID;
 @RestController()
 @RequestMapping("/api/v1/orders")
 public class OrderController extends BaseController {
-    private final OrderApplicationService orderApplicationService;
 
-    public OrderController(Pipeline pipeline, OrderApplicationService orderApplicationService) {
+    public OrderController(Pipeline pipeline) {
         super(pipeline);
-        this.orderApplicationService = orderApplicationService;
     }
 
     @PostMapping()
@@ -52,13 +51,14 @@ public class OrderController extends BaseController {
     }
 
     @GetMapping()
-    public ResponseEntity<List<OrderListingDto>> getAllUserOrders() {
-        List<OrderListingDto> orders = orderApplicationService.getAllUserOrders();
-        return ResponseEntity.ok(orders);
+    public ResponseEntity<List<OrderListingDto>> getUsersAllOrders() {
+        GetUsersAllOrdersQuery getUsersAllOrdersQuery = new GetUsersAllOrdersQuery();
+        return ResponseEntity.ok(getUsersAllOrdersQuery.execute(pipeline));
     }
 
     @GetMapping("/{orderId}")
     public ResponseEntity<OrderListingDto> getOrderById(@PathVariable Integer orderId) {
-        return ResponseEntity.ok(orderApplicationService.getOrderById(orderId));
+        GetOrderByIdQuery getOrderByIdQuery = new GetOrderByIdQuery(orderId);
+        return ResponseEntity.ok(getOrderByIdQuery.execute(pipeline));
     }
 }

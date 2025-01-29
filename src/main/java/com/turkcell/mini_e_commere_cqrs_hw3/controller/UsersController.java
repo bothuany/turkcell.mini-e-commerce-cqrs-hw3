@@ -2,10 +2,11 @@ package com.turkcell.mini_e_commere_cqrs_hw3.controller;
 
 import an.awesome.pipelinr.Pipeline;
 import com.turkcell.mini_e_commere_cqrs_hw3.application.commands.user.delete.DeleteUserCommand;
+import com.turkcell.mini_e_commere_cqrs_hw3.application.queries.user.getall.GetAllUsersQuery;
+import com.turkcell.mini_e_commere_cqrs_hw3.application.queries.user.getbyid.GetUserByIdQuery;
 import com.turkcell.mini_e_commere_cqrs_hw3.core.web.BaseController;
 import com.turkcell.mini_e_commere_cqrs_hw3.dto.user.UserListingDto;
 import com.turkcell.mini_e_commere_cqrs_hw3.application.commands.user.update.UpdateUserCommand;
-import com.turkcell.mini_e_commere_cqrs_hw3.domain.service.application.UserApplicationService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,21 +16,21 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/v1/users")
 public class UsersController extends BaseController {
-    private final UserApplicationService userApplicationService;
 
-    public UsersController(Pipeline pipeline, UserApplicationService userApplicationService) {
+    public UsersController(Pipeline pipeline ) {
         super(pipeline);
-        this.userApplicationService = userApplicationService;
     }
 
     @GetMapping
     public ResponseEntity<List<UserListingDto>> getAll() {
-        return ResponseEntity.ok(this.userApplicationService.getAll());
+        GetAllUsersQuery query = new GetAllUsersQuery();
+        return ResponseEntity.ok(query.execute(pipeline));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<UserListingDto> getById(@PathVariable UUID id) {
-        return ResponseEntity.ok(this.userApplicationService.getById(id));
+        GetUserByIdQuery query = new GetUserByIdQuery(id);
+        return ResponseEntity.ok(query.execute(pipeline));
     }
 
     @DeleteMapping("/{id}")

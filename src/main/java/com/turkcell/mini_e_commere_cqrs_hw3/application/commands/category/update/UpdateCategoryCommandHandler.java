@@ -4,7 +4,7 @@ import an.awesome.pipelinr.Command;
 import com.turkcell.mini_e_commere_cqrs_hw3.domain.entity.Category;
 import com.turkcell.mini_e_commere_cqrs_hw3.domain.repository.CategoryRepository;
 import com.turkcell.mini_e_commere_cqrs_hw3.rules.CategoryBusinessRules;
-import com.turkcell.mini_e_commere_cqrs_hw3.util.exception.type.BusinessException;
+import com.turkcell.mini_e_commere_cqrs_hw3.core.exception.type.BusinessException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

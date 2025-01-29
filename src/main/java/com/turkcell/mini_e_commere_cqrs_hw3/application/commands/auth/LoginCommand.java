@@ -14,7 +14,7 @@ public class LoginCommand implements Command<AuthUserDto> {
     @NotBlank(message = "Username cannot be empty")
     @Email(message = "Invalid email format")
     private String username;
-    
+
     @NotBlank(message = "Password cannot be empty")
     private String password;
 }

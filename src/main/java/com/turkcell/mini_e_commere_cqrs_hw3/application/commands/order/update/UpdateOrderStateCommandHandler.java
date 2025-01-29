@@ -6,7 +6,7 @@ import com.turkcell.mini_e_commere_cqrs_hw3.domain.repository.OrderRepository;
 import com.turkcell.mini_e_commere_cqrs_hw3.dto.order.OrderListingDto;
 import com.turkcell.mini_e_commere_cqrs_hw3.enums.OrderStatus;
 import com.turkcell.mini_e_commere_cqrs_hw3.rules.OrderBusinessRules;
-import com.turkcell.mini_e_commere_cqrs_hw3.util.exception.type.BusinessException;
+import com.turkcell.mini_e_commere_cqrs_hw3.core.exception.type.BusinessException;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;

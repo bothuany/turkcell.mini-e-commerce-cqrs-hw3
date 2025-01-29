@@ -5,8 +5,7 @@ import com.turkcell.mini_e_commere_cqrs_hw3.domain.entity.Cart;
 import com.turkcell.mini_e_commere_cqrs_hw3.domain.entity.CartItem;
 import com.turkcell.mini_e_commere_cqrs_hw3.domain.entity.Product;
 import com.turkcell.mini_e_commere_cqrs_hw3.domain.repository.CartRepository;
-import com.turkcell.mini_e_commere_cqrs_hw3.domain.service.domain.CartService;
-import com.turkcell.mini_e_commere_cqrs_hw3.domain.service.domain.ProductService;
+import com.turkcell.mini_e_commere_cqrs_hw3.domain.repository.ProductRepository;
 import com.turkcell.mini_e_commere_cqrs_hw3.rules.CartBusinessRules;
 import com.turkcell.mini_e_commere_cqrs_hw3.rules.ProductBusinessRules;
 import lombok.RequiredArgsConstructor;
@@ -18,14 +17,14 @@ import java.math.BigDecimal;
 @RequiredArgsConstructor
 public class AddToCartCommandHandler implements Command.Handler<AddToCartCommand, Void> {
     private final CartRepository cartRepository;
-    private final CartService cartService;
-    private final ProductService productService;
+    private final ProductRepository productRepository;
     private final CartBusinessRules cartBusinessRules;
     private final ProductBusinessRules productBusinessRules;
 
     @Override
     public Void handle(AddToCartCommand command) {
-        int cartId = cartService.getCartIdByUserId(command.getUserId());
+        int cartId = cartRepository.findByUserId(command.getUserId())
+                .orElseThrow(() -> new RuntimeException("Cart not found")).getId();
         int productId = command.getProductId();
         int quantity = command.getQuantity();
 
@@ -44,7 +43,8 @@ public class AddToCartCommandHandler implements Command.Handler<AddToCartCommand
                 .findFirst()
                 .orElse(null);
 
-        Product product = productService.getById(productId);
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("Product not found"));
         BigDecimal itemPrice = product.getUnitPrice().multiply(BigDecimal.valueOf(quantity));
 
         if (existingItem != null) {
