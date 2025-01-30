@@ -1,13 +1,15 @@
 package com.turkcell.mini_e_commere_cqrs_hw3.application.commands.order.create;
 
 import an.awesome.pipelinr.Command;
+import an.awesome.pipelinr.Pipeline;
+import com.turkcell.mini_e_commere_cqrs_hw3.application.commands.cart.delete.ResetCartCommand;
 import com.turkcell.mini_e_commere_cqrs_hw3.core.exception.type.BusinessException;
+import com.turkcell.mini_e_commere_cqrs_hw3.domain.entity.Cart;
 import com.turkcell.mini_e_commere_cqrs_hw3.domain.entity.Order;
 import com.turkcell.mini_e_commere_cqrs_hw3.domain.entity.OrderItem;
 import com.turkcell.mini_e_commere_cqrs_hw3.domain.entity.User;
 import com.turkcell.mini_e_commere_cqrs_hw3.domain.repository.OrderRepository;
 import com.turkcell.mini_e_commere_cqrs_hw3.domain.repository.UserRepository;
-import com.turkcell.mini_e_commere_cqrs_hw3.domain.service.CartService;
 import com.turkcell.mini_e_commere_cqrs_hw3.dto.order.OrderListingDto;
 import com.turkcell.mini_e_commere_cqrs_hw3.enums.OrderStatus;
 import com.turkcell.mini_e_commere_cqrs_hw3.rules.OrderBusinessRules;
@@ -23,8 +25,8 @@ import java.util.stream.Collectors;
 @Component
 @RequiredArgsConstructor
 public class CreateOrderCommandHandler implements Command.Handler<CreateOrderCommand, OrderListingDto>{
+    private final Pipeline pipeline;
     private final UserRepository userRepository;
-    private final CartService cartService;
     private final OrderRepository orderRepository;
     private final OrderBusinessRules orderBusinessRules;
     private final ModelMapper modelMapper;
@@ -36,13 +38,27 @@ public class CreateOrderCommandHandler implements Command.Handler<CreateOrderCom
         orderBusinessRules.cartMustNotBeEmpty(user.getCart());
         orderBusinessRules.checkTheProductStockAfterUpdateProductStockForOrder(user.getCart());
 
+        Order order = createOrder(user);
+        List<OrderItem> orderItems = createOrderItems(user.getCart(), order);
+        order.setOrderItems(orderItems);
+
+        pipeline.send(new ResetCartCommand(user.getCart().getId()));
+        orderRepository.save(order);
+
+        return modelMapper.map(order, OrderListingDto.class);
+    }
+
+    private Order createOrder(User user) {
         Order order = new Order();
         order.setUser(user);
         order.setOrderDate(LocalDateTime.now());
         order.setStatus(OrderStatus.PREPARING);
         order.setTotalPrice(user.getCart().getTotalPrice());
+        return order;
+    }
 
-        List<OrderItem> orderItems = user.getCart().getCartItems().stream().map(item -> {
+    private List<OrderItem> createOrderItems(Cart cart, Order order) {
+        return cart.getCartItems().stream().map(item -> {
             OrderItem orderItem = new OrderItem();
             orderItem.setProduct(item.getProduct());
             orderItem.setQuantity(item.getQuantity());
@@ -50,12 +66,5 @@ public class CreateOrderCommandHandler implements Command.Handler<CreateOrderCom
             orderItem.setOrder(order);
             return orderItem;
         }).collect(Collectors.toList());
-
-        order.setOrderItems(orderItems);
-
-        cartService.resetCart(user.getCart().getId());
-        orderRepository.save(order);
-
-        return modelMapper.map(order, OrderListingDto.class);
     }
 }

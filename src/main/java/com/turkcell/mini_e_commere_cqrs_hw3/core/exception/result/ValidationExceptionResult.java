@@ -8,10 +8,14 @@ import java.util.List;
 @Getter
 @Setter
 public class ValidationExceptionResult extends ExceptionResult{
-  private List<String> errors;
+  private List<CustomExceptionResult> errors;
 
-  public ValidationExceptionResult(List<String> errors) {
+  public ValidationExceptionResult(List<CustomExceptionResult> errors) {
     super("ValidationError");
     this.errors = errors;
   }
+
+  public record CustomExceptionResult(String field, String message) {
+  }
 }
+

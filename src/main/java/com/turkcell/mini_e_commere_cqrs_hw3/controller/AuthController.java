@@ -22,22 +22,22 @@ public class AuthController extends BaseController {
     }
 
     @PostMapping("register/customer")
-    public ResponseEntity<AuthUserDto> register(@RequestBody @Valid RegisterCustomerCommand registerCustomerCommand) {
+    public ResponseEntity<AuthUserDto> register(@RequestBody RegisterCustomerCommand registerCustomerCommand) {
         return ResponseEntity.ok(registerCustomerCommand.execute(pipeline));
     }
 
     @PostMapping("register/admin")
-    public ResponseEntity<AuthUserDto> registerAdmin(@RequestBody @Valid RegisterAdminCommand registerAdminCommand) {
+    public ResponseEntity<AuthUserDto> registerAdmin(@RequestBody RegisterAdminCommand registerAdminCommand) {
         return ResponseEntity.ok(registerAdminCommand.execute(pipeline));
     }
 
     @PostMapping("register/seller")
-    public ResponseEntity<AuthUserDto> registerSeller(@RequestBody @Valid RegisterSellerCommand registerSellerDto) {
+    public ResponseEntity<AuthUserDto> registerSeller(@RequestBody RegisterSellerCommand registerSellerDto) {
         return ResponseEntity.ok(registerSellerDto.execute(pipeline));
     }
 
     @PostMapping("login")
-    public ResponseEntity<AuthUserDto> login(@RequestBody @Valid LoginCommand loginCommand) {
+    public ResponseEntity<AuthUserDto> login(@RequestBody LoginCommand loginCommand) {
         return ResponseEntity.ok(loginCommand.execute(pipeline));
     }
 }

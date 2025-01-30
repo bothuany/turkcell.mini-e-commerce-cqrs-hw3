@@ -27,12 +27,12 @@ public class ProductsController extends BaseController {
     }
 
     @PostMapping
-    public ResponseEntity<ProductListingDto> add(@RequestBody @Valid CreateProductCommand createProductCommand) {
+    public ResponseEntity<ProductListingDto> add(@RequestBody CreateProductCommand createProductCommand) {
         return ResponseEntity.ok(createProductCommand.execute(pipeline));
     }
 
     @PutMapping
-    public ResponseEntity<ProductListingDto> update(@RequestBody @Valid UpdateProductCommand updateProductCommand) {
+    public ResponseEntity<ProductListingDto> update(@RequestBody UpdateProductCommand updateProductCommand) {
         return ResponseEntity.ok(updateProductCommand.execute(pipeline));
     }
 

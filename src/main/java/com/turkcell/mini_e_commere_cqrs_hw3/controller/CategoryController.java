@@ -25,7 +25,7 @@ public class CategoryController extends BaseController {
     }
 
     @PostMapping
-    public ResponseEntity<Void> createCategory(@Valid @RequestBody CreateCategoryCommand createCategoryCommand) {
+    public ResponseEntity<Void> createCategory(@RequestBody CreateCategoryCommand createCategoryCommand) {
         createCategoryCommand.execute(pipeline);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }

@@ -3,6 +3,7 @@ package com.turkcell.mini_e_commere_cqrs_hw3.core.exception;
 import com.turkcell.mini_e_commere_cqrs_hw3.core.exception.result.BusinessExceptionResult;
 import com.turkcell.mini_e_commere_cqrs_hw3.core.exception.result.ValidationExceptionResult;
 import com.turkcell.mini_e_commere_cqrs_hw3.core.exception.type.BusinessException;
+import com.turkcell.mini_e_commere_cqrs_hw3.core.exception.type.ValidationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -18,15 +19,17 @@ public class GlobalExceptionHandler
     return new BusinessExceptionResult(e.getMessage());
   }
 
-  @ExceptionHandler({MethodArgumentNotValidException.class})
-  @ResponseStatus(HttpStatus.BAD_REQUEST)
-  public ValidationExceptionResult handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
-    return new ValidationExceptionResult(e
-            .getBindingResult()
-            .getFieldErrors()
-            .stream()
-            .map((error) -> error.getDefaultMessage())
-            .toList());
-  }
-
+  @ExceptionHandler({ValidationException.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ValidationExceptionResult handleMethodArgumentNotValidException(ValidationException e) {
+        return new ValidationExceptionResult(
+                e.getViolations()
+                        .stream()
+                        .map(v ->
+                                new ValidationExceptionResult.CustomExceptionResult(
+                                        v.getPropertyPath().toString(), v.getMessage()
+                                )
+                        ).toList()
+        );
+    }
 }
