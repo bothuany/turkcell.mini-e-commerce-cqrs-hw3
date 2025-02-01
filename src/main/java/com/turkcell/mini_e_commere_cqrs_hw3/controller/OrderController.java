@@ -32,7 +32,6 @@ public class OrderController extends BaseController {
     }
 
     @PostMapping("/admin/create-for-user/{userId}")
-    @PreAuthorize("hasAuthority('admin')")
     public ResponseEntity<OrderListingDto> createOrderForUser(@PathVariable UUID userId) {
         CreateOrderCommand createOrderCommand = new CreateOrderCommand(userId);
         return ResponseEntity.ok(createOrderCommand.execute(pipeline));
@@ -51,8 +50,8 @@ public class OrderController extends BaseController {
     }
 
     @GetMapping()
-    public ResponseEntity<List<OrderListingDto>> getUsersAllOrders() {
-        GetUsersAllOrdersQuery getUsersAllOrdersQuery = new GetUsersAllOrdersQuery();
+    public ResponseEntity<List<OrderListingDto>> getUsersAllOrders(@AuthenticationPrincipal UserDetails userDetails) {
+        GetUsersAllOrdersQuery getUsersAllOrdersQuery = new GetUsersAllOrdersQuery(userDetails.getUsername());
         return ResponseEntity.ok(getUsersAllOrdersQuery.execute(pipeline));
     }
 

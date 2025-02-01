@@ -6,5 +6,5 @@ import com.turkcell.mini_e_commere_cqrs_hw3.dto.order.OrderListingDto;
 
 import java.util.List;
 
-public record GetUsersAllOrdersQuery() implements Command<List<OrderListingDto>>, AuthenticatedRequest {
+public record GetUsersAllOrdersQuery(String userId) implements Command<List<OrderListingDto>>, AuthenticatedRequest {
 }

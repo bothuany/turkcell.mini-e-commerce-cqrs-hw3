@@ -6,6 +6,8 @@ import com.turkcell.mini_e_commere_cqrs_hw3.domain.entity.CartItem;
 import com.turkcell.mini_e_commere_cqrs_hw3.domain.entity.Product;
 import com.turkcell.mini_e_commere_cqrs_hw3.domain.repository.CartRepository;
 import com.turkcell.mini_e_commere_cqrs_hw3.domain.repository.ProductRepository;
+import com.turkcell.mini_e_commere_cqrs_hw3.domain.service.CartService;
+import com.turkcell.mini_e_commere_cqrs_hw3.domain.service.ProductService;
 import com.turkcell.mini_e_commere_cqrs_hw3.rules.CartBusinessRules;
 import com.turkcell.mini_e_commere_cqrs_hw3.rules.ProductBusinessRules;
 import lombok.RequiredArgsConstructor;
@@ -16,15 +18,14 @@ import java.math.BigDecimal;
 @Component
 @RequiredArgsConstructor
 public class AddToCartCommandHandler implements Command.Handler<AddToCartCommand, Void> {
-    private final CartRepository cartRepository;
-    private final ProductRepository productRepository;
+    private final CartService cartService;
+    private final ProductService productService;
     private final CartBusinessRules cartBusinessRules;
     private final ProductBusinessRules productBusinessRules;
 
     @Override
     public Void handle(AddToCartCommand command) {
-        int cartId = cartRepository.findByUserId(command.getUserId())
-                .orElseThrow(() -> new RuntimeException("Cart not found")).getId();
+        int cartId = cartService.getCartIdByUserId(command.getUserId());
         int productId = command.getProductId();
         int quantity = command.getQuantity();
 
@@ -33,8 +34,7 @@ public class AddToCartCommandHandler implements Command.Handler<AddToCartCommand
         productBusinessRules.productMustBeInStock(productId, quantity);
         productBusinessRules.productMustBeInStockInCart(cartId, productId, quantity);
 
-        Cart cart = cartRepository.findById(cartId)
-                .orElseThrow(() -> new RuntimeException("Cart not found"));
+        Cart cart = cartService.getById(cartId);
 
         // Check if product already exists in cart
         CartItem existingItem = cart.getCartItems()
@@ -43,8 +43,7 @@ public class AddToCartCommandHandler implements Command.Handler<AddToCartCommand
                 .findFirst()
                 .orElse(null);
 
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new RuntimeException("Product not found"));
+        Product product = productService.getById(productId);
         BigDecimal itemPrice = product.getUnitPrice().multiply(BigDecimal.valueOf(quantity));
 
         if (existingItem != null) {
@@ -65,7 +64,7 @@ public class AddToCartCommandHandler implements Command.Handler<AddToCartCommand
         cart.setTotalPrice((cart).getTotalPrice()
                 .add(itemPrice));
 
-        cartRepository.save(cart);
+        cartService.update(cart);
         return null;
     }
 }

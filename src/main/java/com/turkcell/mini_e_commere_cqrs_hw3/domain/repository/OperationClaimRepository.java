@@ -10,4 +10,6 @@ import java.util.UUID;
 @Repository
 public interface OperationClaimRepository extends JpaRepository<OperationClaim, UUID> {
     Optional<OperationClaim> findByName(String name);
+
+    boolean existsByName(String name);
 }

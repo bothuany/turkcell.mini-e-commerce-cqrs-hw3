@@ -2,7 +2,7 @@ package com.turkcell.mini_e_commere_cqrs_hw3.application.commands.category.updat
 
 import an.awesome.pipelinr.Command;
 import com.turkcell.mini_e_commere_cqrs_hw3.domain.entity.Category;
-import com.turkcell.mini_e_commere_cqrs_hw3.domain.repository.CategoryRepository;
+import com.turkcell.mini_e_commere_cqrs_hw3.domain.service.CategoryService;
 import com.turkcell.mini_e_commere_cqrs_hw3.rules.CategoryBusinessRules;
 import com.turkcell.mini_e_commere_cqrs_hw3.core.exception.type.BusinessException;
 import lombok.RequiredArgsConstructor;
@@ -11,14 +11,14 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class UpdateCategoryCommandHandler implements Command.Handler<UpdateCategoryCommand, Void> {
-    private final CategoryRepository categoryRepository;
+    private final CategoryService categoryService;
     private final CategoryBusinessRules categoryBusinessRules;
+
     @Override
     public Void handle(UpdateCategoryCommand updateCategoryCommand) {
         categoryBusinessRules.categoryMustExist(updateCategoryCommand.getId());
 
-        Category categoryToUpdate = categoryRepository.findById(updateCategoryCommand.getId())
-                .orElseThrow(() -> new BusinessException("Category not found"));
+        Category categoryToUpdate = categoryService.getById(updateCategoryCommand.getId());
 
         categoryBusinessRules.categoryNameMustBeUniqueExceptForItself(updateCategoryCommand.getId(), updateCategoryCommand.getName());
 
@@ -28,12 +28,11 @@ public class UpdateCategoryCommandHandler implements Command.Handler<UpdateCateg
             if (updateCategoryCommand.getId().equals(updateCategoryCommand.getParentId())) {
                 throw new BusinessException("A category cannot be its own parent");
             }
-            Category parent = categoryRepository.findById(updateCategoryCommand.getParentId())
-                    .orElseThrow(() -> new BusinessException("Parent category not found"));
+            Category parent = categoryService.getById(updateCategoryCommand.getParentId());
             categoryToUpdate.setParent(parent);
         }
 
-        categoryRepository.save(categoryToUpdate);
+        categoryService.update(categoryToUpdate);
         return null;
     }
 }

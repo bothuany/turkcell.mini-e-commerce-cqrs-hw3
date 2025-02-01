@@ -28,4 +28,8 @@ public interface ProductRepository extends JpaRepository<Product, Integer>
           @Param("maxPrice") BigDecimal maxPrice,
           @Param("inStock") Boolean inStock
   );
+
+  boolean existsByName(String name);
+
+  boolean existsByNameAndIdNot(String name, Integer id);
 }

@@ -7,7 +7,6 @@ import com.turkcell.mini_e_commere_cqrs_hw3.application.commands.auth.RegisterCu
 import com.turkcell.mini_e_commere_cqrs_hw3.application.commands.auth.RegisterSellerCommand;
 import com.turkcell.mini_e_commere_cqrs_hw3.core.web.BaseController;
 import com.turkcell.mini_e_commere_cqrs_hw3.dto.user.*;
-import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;

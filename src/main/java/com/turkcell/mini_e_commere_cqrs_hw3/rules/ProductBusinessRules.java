@@ -41,7 +41,6 @@ public class ProductBusinessRules {
         }
     }
 
-    //Sepette aynı üründen varsa, eklenen miktar stok miktarını aşmamalı
     public void productMustBeInStockInCart(Integer cartId, Integer productId, Integer quantity) {
         if (cartRepository.existsById(cartId)) {
             Cart cart = cartRepository.findById(cartId).get();
@@ -56,6 +55,12 @@ public class ProductBusinessRules {
                     throw new BusinessException("Product is not in stock");
                 }
             }
+        }
+    }
+
+    public void productMustBeUniqueExceptForItself(String name, Integer id) {
+        if (productRepository.existsByNameAndIdNot(name, id)) {
+            throw new BusinessException("Product name must be unique");
         }
     }
 

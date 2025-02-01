@@ -13,4 +13,10 @@ public class OperationClaimBusinessRules {
     public void operationClaimMustExist(String name) {
         operationClaimRepository.findByName(name).orElseThrow(() -> new BusinessException("Operation claim not found"));
     }
+
+    public void operationClaimNameMustBeUnique(String name) {
+        if (operationClaimRepository.existsByName(name)) {
+            throw new BusinessException("Operation claim name must be unique");
+        }
+    }
 }

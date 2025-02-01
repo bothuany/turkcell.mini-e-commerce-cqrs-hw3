@@ -3,7 +3,7 @@ package com.turkcell.mini_e_commere_cqrs_hw3.application.queries.category.getall
 import an.awesome.pipelinr.Command;
 
 import com.turkcell.mini_e_commere_cqrs_hw3.domain.entity.Category;
-import com.turkcell.mini_e_commere_cqrs_hw3.domain.repository.CategoryRepository;
+import com.turkcell.mini_e_commere_cqrs_hw3.domain.service.CategoryService;
 import com.turkcell.mini_e_commere_cqrs_hw3.dto.category.CategoryListingDto;
 import lombok.RequiredArgsConstructor;
 
@@ -17,17 +17,17 @@ import java.util.stream.Collectors;
 @Component
 @RequiredArgsConstructor
 public class GetCategoryTreeQueryHandler implements Command.Handler<GetCategoryTreeQuery, List<CategoryListingDto>> {
-    private final CategoryRepository categoryRepository;
+    private final CategoryService categoryService;
     private final ModelMapper modelMapper;
 
     @Override
     public List<CategoryListingDto> handle(GetCategoryTreeQuery getCategoryTreeQuery) {
-        List<Category> allCategories = categoryRepository.findAll();
+        List<Category> allCategories = categoryService.getAll();
 
         // Get root categories (categories without parent)
         List<Category> rootCategories = allCategories.stream()
                 .filter(category -> category.getParent() == null)
-                .collect(Collectors.toList());
+                .toList();
 
         // Convert to DTOs with recursive subcategory mapping
         return rootCategories.stream()

@@ -9,7 +9,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
 import com.turkcell.mini_e_commere_cqrs_hw3.domain.entity.Product;
-import com.turkcell.mini_e_commere_cqrs_hw3.domain.repository.ProductRepository;
+import com.turkcell.mini_e_commere_cqrs_hw3.domain.service.ProductService;
 import com.turkcell.mini_e_commere_cqrs_hw3.dto.product.ProductListingDto;
 
 import an.awesome.pipelinr.Command;
@@ -18,12 +18,12 @@ import an.awesome.pipelinr.Command;
 @RequiredArgsConstructor
 public class GetFilteredProductsQueryHandler
         implements Command.Handler<GetFilteredProductsQuery, List<ProductListingDto>> {
-    private final ProductRepository productRepository;
+    private final ProductService productService;
     private final ModelMapper modelMapper;
 
     @Override
     public List<ProductListingDto> handle(GetFilteredProductsQuery getFilteredProductsQuery) {
-        List<Product> products = productRepository.search(
+        List<Product> products = productService.search(
                 getFilteredProductsQuery.categoryId(),
                 getFilteredProductsQuery.minPrice(),
                 getFilteredProductsQuery.maxPrice(),

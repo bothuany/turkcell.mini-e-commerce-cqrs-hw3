@@ -3,7 +3,7 @@ package com.turkcell.mini_e_commere_cqrs_hw3.application.queries.category.getall
 import an.awesome.pipelinr.Command;
 
 import com.turkcell.mini_e_commere_cqrs_hw3.domain.entity.Category;
-import com.turkcell.mini_e_commere_cqrs_hw3.domain.repository.CategoryRepository;
+import com.turkcell.mini_e_commere_cqrs_hw3.domain.service.CategoryService;
 import com.turkcell.mini_e_commere_cqrs_hw3.dto.category.CategoryListingDto;
 import com.turkcell.mini_e_commere_cqrs_hw3.rules.CategoryBusinessRules;
 
@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 @Component
 @RequiredArgsConstructor
 public class GetSubCategoriesQueryHandler implements Command.Handler<GetSubCategoriesQuery, List<CategoryListingDto>> {
-    private final CategoryRepository categoryRepository;
+    private final CategoryService categoryService;
     private final CategoryBusinessRules categoryBusinessRules;
     private final ModelMapper modelMapper;
 
@@ -26,7 +26,7 @@ public class GetSubCategoriesQueryHandler implements Command.Handler<GetSubCateg
     public List<CategoryListingDto> handle(GetSubCategoriesQuery getSubCategoriesQuery) {
         Integer parentId = getSubCategoriesQuery.id();
         categoryBusinessRules.categoryMustExist(parentId);
-        List<Category> subCategories = categoryRepository.findAllByParentId(parentId);
+        List<Category> subCategories = categoryService.getAllSubCategories(parentId);
         return subCategories.stream()
                 .map(category -> modelMapper.map(category, CategoryListingDto.class))
                 .collect(Collectors.toList());

@@ -1,70 +1,42 @@
 package com.turkcell.mini_e_commere_cqrs_hw3.application.commands.order.create;
 
 import an.awesome.pipelinr.Command;
-import an.awesome.pipelinr.Pipeline;
-import com.turkcell.mini_e_commere_cqrs_hw3.application.commands.cart.delete.ResetCartCommand;
-import com.turkcell.mini_e_commere_cqrs_hw3.core.exception.type.BusinessException;
-import com.turkcell.mini_e_commere_cqrs_hw3.domain.entity.Cart;
 import com.turkcell.mini_e_commere_cqrs_hw3.domain.entity.Order;
 import com.turkcell.mini_e_commere_cqrs_hw3.domain.entity.OrderItem;
 import com.turkcell.mini_e_commere_cqrs_hw3.domain.entity.User;
-import com.turkcell.mini_e_commere_cqrs_hw3.domain.repository.OrderRepository;
-import com.turkcell.mini_e_commere_cqrs_hw3.domain.repository.UserRepository;
+import com.turkcell.mini_e_commere_cqrs_hw3.domain.service.CartService;
+import com.turkcell.mini_e_commere_cqrs_hw3.domain.service.OrderService;
+import com.turkcell.mini_e_commere_cqrs_hw3.domain.service.UserService;
 import com.turkcell.mini_e_commere_cqrs_hw3.dto.order.OrderListingDto;
-import com.turkcell.mini_e_commere_cqrs_hw3.enums.OrderStatus;
 import com.turkcell.mini_e_commere_cqrs_hw3.rules.OrderBusinessRules;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
 public class CreateOrderCommandHandler implements Command.Handler<CreateOrderCommand, OrderListingDto>{
-    private final Pipeline pipeline;
-    private final UserRepository userRepository;
-    private final OrderRepository orderRepository;
+    private final CartService cartService;
+    private final UserService userService;
+    private final OrderService orderService;
     private final OrderBusinessRules orderBusinessRules;
     private final ModelMapper modelMapper;
 
     @Override
     public OrderListingDto handle(CreateOrderCommand createOrderCommand) {
-        User user = userRepository.findById(createOrderCommand.getUserId())
-                .orElseThrow(() -> new BusinessException("User not found"));
+        User user = userService.getById(createOrderCommand.getUserId());
         orderBusinessRules.cartMustNotBeEmpty(user.getCart());
         orderBusinessRules.checkTheProductStockAfterUpdateProductStockForOrder(user.getCart());
 
-        Order order = createOrder(user);
-        List<OrderItem> orderItems = createOrderItems(user.getCart(), order);
+        Order order = orderService.createOrderForUser(user);
+        List<OrderItem> orderItems = orderService.createOrderItems(user.getCart(), order);
         order.setOrderItems(orderItems);
 
-        pipeline.send(new ResetCartCommand(user.getCart().getId()));
-        orderRepository.save(order);
+        cartService.resetCart(user.getCart().getId());
+        orderService.update(order);
 
         return modelMapper.map(order, OrderListingDto.class);
-    }
-
-    private Order createOrder(User user) {
-        Order order = new Order();
-        order.setUser(user);
-        order.setOrderDate(LocalDateTime.now());
-        order.setStatus(OrderStatus.PREPARING);
-        order.setTotalPrice(user.getCart().getTotalPrice());
-        return order;
-    }
-
-    private List<OrderItem> createOrderItems(Cart cart, Order order) {
-        return cart.getCartItems().stream().map(item -> {
-            OrderItem orderItem = new OrderItem();
-            orderItem.setProduct(item.getProduct());
-            orderItem.setQuantity(item.getQuantity());
-            orderItem.setPrice(item.getProduct().getUnitPrice().multiply(BigDecimal.valueOf(item.getQuantity())));
-            orderItem.setOrder(order);
-            return orderItem;
-        }).collect(Collectors.toList());
     }
 }
