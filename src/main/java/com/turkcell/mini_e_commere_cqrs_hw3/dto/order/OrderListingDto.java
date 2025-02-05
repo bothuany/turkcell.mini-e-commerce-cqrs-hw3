@@ -13,7 +13,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class OrderListingDto {
     private Integer id;
-    private UUID userId;
+    private UUID customerId;
     private List<OrderItemDto> orderItems;
     private BigDecimal totalPrice;
     private LocalDateTime orderDate;

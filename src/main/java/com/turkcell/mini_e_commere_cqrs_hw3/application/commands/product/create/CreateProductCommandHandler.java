@@ -20,12 +20,7 @@ public class CreateProductCommandHandler implements Command.Handler<CreateProduc
     @Override
     public ProductListingDto handle(CreateProductCommand createProductCommand) {
         categoryBusinessRules.categoryMustExist(createProductCommand.getCategoryId());
-        Product productWithSameName = productService.getByName(createProductCommand.getName());
-
-        if (productWithSameName != null)
-            throw new BusinessException("Product already exists");
-
-        Product product = productService.update(modelMapper.map(createProductCommand, Product.class));
+        Product product = productService.add(modelMapper.map(createProductCommand, Product.class));
         return modelMapper.map(product, ProductListingDto.class);
     }
 }

@@ -12,7 +12,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class CartListingDto {
     private Integer id;
-    private UUID userId;
+    private UUID customerId;
     private List<CartItemDto> cartItems;
     private BigDecimal totalPrice;
 }

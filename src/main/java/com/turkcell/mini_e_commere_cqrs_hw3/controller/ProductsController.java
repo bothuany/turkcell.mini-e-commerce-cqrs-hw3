@@ -9,13 +9,16 @@ import com.turkcell.mini_e_commere_cqrs_hw3.application.queries.product.getall.G
 import com.turkcell.mini_e_commere_cqrs_hw3.application.queries.product.getbyid.GetProductByIdQuery;
 import com.turkcell.mini_e_commere_cqrs_hw3.core.web.BaseController;
 import com.turkcell.mini_e_commere_cqrs_hw3.dto.product.ProductListingDto;
+import com.turkcell.mini_e_commere_cqrs_hw3.enums.OperationClaims;
 import jakarta.annotation.Nullable;
-import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.UUID;
 
 
 @RestController()
@@ -27,12 +30,18 @@ public class ProductsController extends BaseController {
     }
 
     @PostMapping
-    public ResponseEntity<ProductListingDto> add(@RequestBody CreateProductCommand createProductCommand) {
+    public ResponseEntity<ProductListingDto> add(@AuthenticationPrincipal UserDetails userDetails, @RequestBody CreateProductCommand createProductCommand) {
+        if(this.hasOperationClaims(userDetails, OperationClaims.seller)) {
+            createProductCommand.setSellerId(UUID.fromString(userDetails.getUsername()));
+        }
         return ResponseEntity.ok(createProductCommand.execute(pipeline));
     }
 
     @PutMapping
-    public ResponseEntity<ProductListingDto> update(@RequestBody UpdateProductCommand updateProductCommand) {
+    public ResponseEntity<ProductListingDto> update(@AuthenticationPrincipal UserDetails userDetails, @RequestBody UpdateProductCommand updateProductCommand) {
+        if(this.hasOperationClaims(userDetails, OperationClaims.seller)) {
+            updateProductCommand.setSellerId(UUID.fromString(userDetails.getUsername()));
+        }
         return ResponseEntity.ok(updateProductCommand.execute(pipeline));
     }
 

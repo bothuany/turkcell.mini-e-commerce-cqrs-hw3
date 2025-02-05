@@ -31,7 +31,7 @@ public class LoginCommandHandler implements Command.Handler<LoginCommand, AuthUs
             throw new BusinessException("Invalid or wrong credentials.");
 
         AuthUserDto authUserDto = new AuthUserDto();
-        authUserDto.setToken(this.jwtService.generateToken(user.getUsername(), getRoles(user)));
+        authUserDto.setToken(this.jwtService.generateToken(String.valueOf(user.getId()), getRoles(user)));
         return authUserDto;
     }
 }

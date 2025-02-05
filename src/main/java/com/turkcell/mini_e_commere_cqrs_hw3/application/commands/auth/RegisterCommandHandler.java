@@ -1,13 +1,9 @@
 package com.turkcell.mini_e_commere_cqrs_hw3.application.commands.auth;
 
 import an.awesome.pipelinr.Command;
-import an.awesome.pipelinr.Pipeline;
-import com.turkcell.mini_e_commere_cqrs_hw3.application.commands.operationClaim.create.CreateOperationClaimIfNotExistsCommand;
-import com.turkcell.mini_e_commere_cqrs_hw3.application.queries.operationClaim.getbyid.GetOperationClaimByNameQuery;
 import com.turkcell.mini_e_commere_cqrs_hw3.domain.entity.*;
-import com.turkcell.mini_e_commere_cqrs_hw3.domain.repository.AdminRepository;
-import com.turkcell.mini_e_commere_cqrs_hw3.domain.repository.CustomerRepository;
-import com.turkcell.mini_e_commere_cqrs_hw3.domain.repository.SellerRepository;
+import com.turkcell.mini_e_commere_cqrs_hw3.domain.repository.*;
+import com.turkcell.mini_e_commere_cqrs_hw3.domain.service.OperationClaimService;
 import com.turkcell.mini_e_commere_cqrs_hw3.dto.user.AuthUserDto;
 import com.turkcell.mini_e_commere_cqrs_hw3.enums.OperationClaims;
 import com.turkcell.mini_e_commere_cqrs_hw3.rules.UserBusinessRules;
@@ -27,14 +23,15 @@ import static com.turkcell.mini_e_commere_cqrs_hw3.domain.service.UserService.ge
 @Component
 @RequiredArgsConstructor
 public class RegisterCommandHandler implements Command.Handler<RegisterCommand, AuthUserDto> {
-    private final Pipeline pipeline;
     private final UserBusinessRules userBusinessRules;
     private final JwtService jwtService;
+    private final OperationClaimService operationClaimService;
     private final PasswordEncoder passwordEncoder;
     private final ModelMapper modelMapper;
     private final AdminRepository adminRepository;
     private final CustomerRepository customerRepository;
     private final SellerRepository sellerRepository;
+    private final CartRepository cartRepository;
 
     @Override
     public AuthUserDto handle(RegisterCommand registerCommand) {
@@ -61,23 +58,29 @@ public class RegisterCommandHandler implements Command.Handler<RegisterCommand, 
         user.setOperationClaims(claims);
 
         repository.save(user);
+
+        // Create cart for customer
+        if (user instanceof Customer customer) {
+            Cart cart = new Cart();
+            cart.setCustomer(customer);
+            cartRepository.save(cart);
+        }
+
         return createAuthUserDto(user);
     }
 
     private List<OperationClaim> createAndGetOperationClaims(OperationClaims operationClaim) {
         String claimName = operationClaim.name();
-        CreateOperationClaimIfNotExistsCommand createCommand = new CreateOperationClaimIfNotExistsCommand(claimName);
-        pipeline.send(createCommand);
+        operationClaimService.createOperationClaimIfNotExists(claimName);
 
         List<OperationClaim> claims = new ArrayList<>();
-        GetOperationClaimByNameQuery getQuery = new GetOperationClaimByNameQuery(claimName);
-        claims.add(pipeline.send(getQuery));
+        claims.add(operationClaimService.getByName(claimName));
         return claims;
     }
 
     private AuthUserDto createAuthUserDto(User user) {
         AuthUserDto authUserDto = new AuthUserDto();
-        authUserDto.setToken(this.jwtService.generateToken(user.getUsername(), getRoles(user)));
+        authUserDto.setToken(this.jwtService.generateToken(String.valueOf(user.getId()), getRoles(user)));
         return authUserDto;
     }
 }

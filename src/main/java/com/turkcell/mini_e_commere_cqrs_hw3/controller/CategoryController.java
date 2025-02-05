@@ -33,7 +33,7 @@ public class CategoryController extends BaseController {
     @PutMapping("/{id}")
     public ResponseEntity<Void> updateCategory(
             @PathVariable Integer id,
-            @Valid @RequestBody UpdateCategoryCommand updateCategoryCommand) {
+            @RequestBody UpdateCategoryCommand updateCategoryCommand) {
         updateCategoryCommand.setId(id);
         updateCategoryCommand.execute(pipeline);
         return ResponseEntity.ok().build();

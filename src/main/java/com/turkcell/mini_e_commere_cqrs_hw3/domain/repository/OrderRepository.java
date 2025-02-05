@@ -14,6 +14,6 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
            "JOIN o.orderItems oi WHERE oi.product.id = :productId")
     boolean existsByProductId(@Param("productId") Integer productId);
 
-    List<Order> findByUserIdOrderByOrderDateDesc(UUID userId);
+    List<Order> findByCustomerIdOrderByOrderDateDesc(UUID customerId);
 
 }

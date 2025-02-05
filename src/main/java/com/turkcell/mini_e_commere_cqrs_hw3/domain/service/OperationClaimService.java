@@ -14,4 +14,6 @@ public interface OperationClaimService {
     void deleteByName(String name);
 
     void add(OperationClaim operationClaim);
+
+    void createOperationClaimIfNotExists(String claimName);
 }

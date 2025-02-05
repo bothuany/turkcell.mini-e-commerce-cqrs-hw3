@@ -12,15 +12,15 @@ import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
-public class GetAllOrdersQueryHandler implements Command.Handler<GetUsersAllOrdersQuery, List<OrderListingDto>>{
+public class GetAllOrdersQueryHandler implements Command.Handler<GetCustomerAllOrdersQuery, List<OrderListingDto>>{
     private final OrderService orderService;
     private final ModelMapper modelMapper;
 
     @Override
-    public List<OrderListingDto> handle(GetUsersAllOrdersQuery getUsersAllOrdersQuery) {
-        UUID userId = UUID.fromString(getUsersAllOrdersQuery.userId());
+    public List<OrderListingDto> handle(GetCustomerAllOrdersQuery getCustomerAllOrdersQuery) {
+        UUID userId = UUID.fromString(getCustomerAllOrdersQuery.userId());
 
-        return orderService.getAllUserOrders(userId).stream()
+        return orderService.getAllCustomerOrders(userId).stream()
                 .map(order -> modelMapper.map(order, OrderListingDto.class))
                 .collect(java.util.stream.Collectors.toList());
     }

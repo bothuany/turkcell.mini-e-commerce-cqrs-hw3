@@ -58,6 +58,12 @@ public class ProductBusinessRules {
         }
     }
 
+    public void productMustBeUnique(String name) {
+        if (productRepository.existsByName(name)) {
+            throw new BusinessException("Product name must be unique");
+        }
+    }
+
     public void productMustBeUniqueExceptForItself(String name, Integer id) {
         if (productRepository.existsByNameAndIdNot(name, id)) {
             throw new BusinessException("Product name must be unique");

@@ -1,10 +1,7 @@
 package com.turkcell.mini_e_commere_cqrs_hw3.domain.service;
 
 import com.turkcell.mini_e_commere_cqrs_hw3.core.exception.type.BusinessException;
-import com.turkcell.mini_e_commere_cqrs_hw3.domain.entity.Cart;
-import com.turkcell.mini_e_commere_cqrs_hw3.domain.entity.Order;
-import com.turkcell.mini_e_commere_cqrs_hw3.domain.entity.OrderItem;
-import com.turkcell.mini_e_commere_cqrs_hw3.domain.entity.User;
+import com.turkcell.mini_e_commere_cqrs_hw3.domain.entity.*;
 import com.turkcell.mini_e_commere_cqrs_hw3.domain.repository.OrderRepository;
 import com.turkcell.mini_e_commere_cqrs_hw3.enums.OrderStatus;
 import com.turkcell.mini_e_commere_cqrs_hw3.rules.OrderBusinessRules;
@@ -52,8 +49,8 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<Order> getAllUserOrders(UUID userId) {
-        return orderRepository.findByUserIdOrderByOrderDateDesc(userId);
+    public List<Order> getAllCustomerOrders(UUID customerId) {
+        return orderRepository.findByCustomerIdOrderByOrderDateDesc(customerId);
     }
 
     @Override
@@ -95,12 +92,12 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Order createOrderForUser(User user) {
+    public Order createOrderForUser(Customer customer) {
         Order order = new Order();
-        order.setUser(user);
+        order.setCustomer(customer);
         order.setOrderDate(LocalDateTime.now());
         order.setStatus(OrderStatus.PREPARING);
-        order.setTotalPrice(user.getCart().getTotalPrice());
+        order.setTotalPrice(customer.getCart().getTotalPrice());
         return order;
     }
 }

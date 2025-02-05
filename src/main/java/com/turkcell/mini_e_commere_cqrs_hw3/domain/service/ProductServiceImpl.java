@@ -19,16 +19,11 @@ public class ProductServiceImpl implements ProductService {
     private final ProductBusinessRules productBusinessRules;
 
     @Override
-    public void add(Product product) {
+    public Product add(Product product) {
         categoryBusinessRules.categoryMustExist(product.getCategory().getId());
-        Product productWithSameName = productRepository
-                .findByName(product.getName())
-                .orElse(null);
-
-        if (productWithSameName != null)
-            throw new BusinessException("Product already exists");
-
+        productBusinessRules.productMustBeUnique(product.getName());
         productRepository.save(product);
+        return product;
     }
 
     @Override
@@ -52,18 +47,21 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Product getById(Integer id) {
+        productBusinessRules.productIdMustExist(id);
         return productRepository.findById(id)
                 .orElseThrow(() -> new BusinessException("Product not found"));
     }
 
     @Override
     public Product getByName(String name) {
+        productBusinessRules.productNameMustExist(name);
         return productRepository.findByName(name)
                 .orElseThrow(() -> new BusinessException("Product not found"));
     }
 
     @Override
     public void delete(Integer id) {
+        productBusinessRules.productIdMustExist(id);
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new BusinessException("Product not found"));
 

@@ -19,13 +19,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     @Transactional
     public void add(Category category) {
-        Category categoryWithSameName = categoryRepository
-                .findByName(category.getName())
-                .orElse(null);
-
-        if (categoryWithSameName != null)
-            throw new BusinessException("Category already exists");
-
+        categoryBusinessRules.categoryNameMustBeUnique(category.getName());
         if (category.getParent() != null) {
             categoryBusinessRules.categoryMustExist(category.getParent().getId());
         }

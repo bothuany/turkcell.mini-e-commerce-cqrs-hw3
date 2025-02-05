@@ -11,6 +11,6 @@ public interface ProductService {
     Product getByName(String name);
     List<Product> getAll();
     List<Product> search(String categoryId, BigDecimal minPrice, BigDecimal maxPrice, Boolean inStock);
-    void add(Product product);
+    Product add(Product product);
     Product update(Product product);
 }

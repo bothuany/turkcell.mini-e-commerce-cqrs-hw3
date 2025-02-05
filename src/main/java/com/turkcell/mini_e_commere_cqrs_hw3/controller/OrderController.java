@@ -4,12 +4,11 @@ import an.awesome.pipelinr.Pipeline;
 import com.turkcell.mini_e_commere_cqrs_hw3.application.commands.order.create.CreateOrderCommand;
 import com.turkcell.mini_e_commere_cqrs_hw3.application.commands.order.delete.DeleteOrderCommand;
 import com.turkcell.mini_e_commere_cqrs_hw3.application.commands.order.update.UpdateOrderStateCommand;
-import com.turkcell.mini_e_commere_cqrs_hw3.application.queries.order.getall.GetUsersAllOrdersQuery;
+import com.turkcell.mini_e_commere_cqrs_hw3.application.queries.order.getall.GetCustomerAllOrdersQuery;
 import com.turkcell.mini_e_commere_cqrs_hw3.application.queries.order.getbyid.GetOrderByIdQuery;
 import com.turkcell.mini_e_commere_cqrs_hw3.core.web.BaseController;
 import com.turkcell.mini_e_commere_cqrs_hw3.dto.order.OrderListingDto;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -50,9 +49,9 @@ public class OrderController extends BaseController {
     }
 
     @GetMapping()
-    public ResponseEntity<List<OrderListingDto>> getUsersAllOrders(@AuthenticationPrincipal UserDetails userDetails) {
-        GetUsersAllOrdersQuery getUsersAllOrdersQuery = new GetUsersAllOrdersQuery(userDetails.getUsername());
-        return ResponseEntity.ok(getUsersAllOrdersQuery.execute(pipeline));
+    public ResponseEntity<List<OrderListingDto>> getCustomerAllOrders(@AuthenticationPrincipal UserDetails userDetails) {
+        GetCustomerAllOrdersQuery getCustomerAllOrdersQuery = new GetCustomerAllOrdersQuery(userDetails.getUsername());
+        return ResponseEntity.ok(getCustomerAllOrdersQuery.execute(pipeline));
     }
 
     @GetMapping("/{orderId}")

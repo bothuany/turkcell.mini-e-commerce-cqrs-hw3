@@ -51,9 +51,8 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public int getCartIdByUserId(UUID userId) {
-        return cartRepository.findByUserId(userId)
-                .orElseThrow(() -> new RuntimeException("Cart not found"))
-                .getId();
+    public Cart getCartByCustomerId(UUID customerId) {
+        return cartRepository.findByCustomerId(customerId)
+                .orElseThrow(() -> new RuntimeException("Cart not found"));
     }
 }

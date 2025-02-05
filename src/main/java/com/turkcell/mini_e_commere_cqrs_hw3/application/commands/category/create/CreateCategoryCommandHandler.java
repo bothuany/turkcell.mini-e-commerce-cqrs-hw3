@@ -21,19 +21,18 @@ public class CreateCategoryCommandHandler implements Command.Handler<CreateCateg
         categoryBusinessRules.categoryNameMustBeUnique(createCategoryCommand.getName());
         if (createCategoryCommand.getParentId() == null) {
             Category category = modelMapper.map(createCategoryCommand, Category.class);
-            categoryService.update(category);
+            categoryService.add(category);
         }
         else {
             categoryBusinessRules.categoryMustExist(createCategoryCommand.getParentId());
+            categoryBusinessRules.categoryNameMustBeUnique(createCategoryCommand.getName());
 
             Category parentCategory = categoryService.getById(createCategoryCommand.getParentId());
-            Category subCategory = categoryService.getByName(createCategoryCommand.getName());
-            if (subCategory == null) {
-                throw new BusinessException("Category with this name already exists");
-            }
 
+            Category subCategory = new Category();
+            subCategory.setName(createCategoryCommand.getName());
             subCategory.setParent(parentCategory);
-            categoryService.update(subCategory);
+            categoryService.add(subCategory);
         }
         return null;
     }

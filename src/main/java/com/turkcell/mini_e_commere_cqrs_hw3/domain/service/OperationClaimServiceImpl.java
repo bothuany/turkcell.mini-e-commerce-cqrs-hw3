@@ -21,6 +21,13 @@ public class OperationClaimServiceImpl implements OperationClaimService {
     }
 
     @Override
+    public void createOperationClaimIfNotExists(String claimName) {
+        if (operationClaimRepository.findByName(claimName).isEmpty()) {
+            operationClaimRepository.save(new OperationClaim(claimName));
+        }
+    }
+
+    @Override
     public void deleteByName(String name) {
         operationClaimBusinessRules.operationClaimMustExist(name);
         operationClaimRepository.delete(operationClaimRepository.findByName(name).orElseThrow());

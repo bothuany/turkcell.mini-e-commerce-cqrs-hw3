@@ -36,7 +36,6 @@ public class CreateProductCommand implements Command<ProductListingDto>, Authori
     @NotNull(message = "Category ID cannot be null")
     private Integer categoryId;
 
-    @NotNull(message = "Seller ID cannot be null")
     private UUID sellerId;
 
     @Length(max = 500, message = "Description must be at most 500 characters")

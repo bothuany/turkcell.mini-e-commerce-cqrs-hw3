@@ -1,9 +1,6 @@
 package com.turkcell.mini_e_commere_cqrs_hw3.domain.service;
 
-import com.turkcell.mini_e_commere_cqrs_hw3.domain.entity.Cart;
-import com.turkcell.mini_e_commere_cqrs_hw3.domain.entity.Order;
-import com.turkcell.mini_e_commere_cqrs_hw3.domain.entity.OrderItem;
-import com.turkcell.mini_e_commere_cqrs_hw3.domain.entity.User;
+import com.turkcell.mini_e_commere_cqrs_hw3.domain.entity.*;
 import com.turkcell.mini_e_commere_cqrs_hw3.enums.OrderStatus;
 
 import java.util.List;
@@ -17,7 +14,7 @@ public interface OrderService {
 
     Order updateOrderState(Integer id);
 
-    List<Order> getAllUserOrders(UUID id);
+    List<Order> getAllCustomerOrders(UUID id);
 
     Order getById(Integer id);
 
@@ -27,5 +24,5 @@ public interface OrderService {
 
     List<OrderItem> createOrderItems(Cart cart, Order order);
 
-    Order createOrderForUser(User user);
+    Order createOrderForUser(Customer customer);
 }

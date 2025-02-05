@@ -7,13 +7,17 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class JwtFilter extends OncePerRequestFilter {
@@ -25,8 +29,8 @@ public class JwtFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain filterChain)
+            HttpServletResponse response,
+            FilterChain filterChain)
             throws ServletException, IOException {
         String jwtHeader = request.getHeader("Authorization");
 
@@ -37,14 +41,19 @@ public class JwtFilter extends OncePerRequestFilter {
 
             List<GrantedAuthority> authorities = roles
                     .stream()
-                    .map(role -> (GrantedAuthority) () -> role)
-                    .toList();
+                    .map(SimpleGrantedAuthority::new)
+                    .collect(Collectors.toList());
+
+            UserDetails userDetails = User.builder()
+                    .username(username)
+                    .password("")
+                    .authorities(authorities)
+                    .build();
 
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                    username,
+                    userDetails,
                     null,
-                    authorities
-            );
+                    authorities);
 
             authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 

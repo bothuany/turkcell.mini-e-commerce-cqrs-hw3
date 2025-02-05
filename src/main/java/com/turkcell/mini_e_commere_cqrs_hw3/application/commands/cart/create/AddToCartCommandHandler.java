@@ -4,8 +4,6 @@ import an.awesome.pipelinr.Command;
 import com.turkcell.mini_e_commere_cqrs_hw3.domain.entity.Cart;
 import com.turkcell.mini_e_commere_cqrs_hw3.domain.entity.CartItem;
 import com.turkcell.mini_e_commere_cqrs_hw3.domain.entity.Product;
-import com.turkcell.mini_e_commere_cqrs_hw3.domain.repository.CartRepository;
-import com.turkcell.mini_e_commere_cqrs_hw3.domain.repository.ProductRepository;
 import com.turkcell.mini_e_commere_cqrs_hw3.domain.service.CartService;
 import com.turkcell.mini_e_commere_cqrs_hw3.domain.service.ProductService;
 import com.turkcell.mini_e_commere_cqrs_hw3.rules.CartBusinessRules;
@@ -25,7 +23,7 @@ public class AddToCartCommandHandler implements Command.Handler<AddToCartCommand
 
     @Override
     public Void handle(AddToCartCommand command) {
-        int cartId = cartService.getCartIdByUserId(command.getUserId());
+        int cartId = cartService.getCartByCustomerId(command.getUserId()).getId();
         int productId = command.getProductId();
         int quantity = command.getQuantity();
 

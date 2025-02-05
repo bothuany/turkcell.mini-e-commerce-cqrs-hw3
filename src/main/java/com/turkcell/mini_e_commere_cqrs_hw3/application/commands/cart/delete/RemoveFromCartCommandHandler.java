@@ -21,7 +21,7 @@ public class RemoveFromCartCommandHandler implements Command.Handler<RemoveFromC
     private final ProductBusinessRules productBusinessRules;
     @Override
     public Void handle(RemoveFromCartCommand command) {
-        int cartId = cartService.getCartIdByUserId(command.getUserId());
+        int cartId = cartService.getCartByCustomerId(command.getUserId()).getId();
         int cartItemId = command.getCartItemId();
         int quantity = command.getQuantity();
 

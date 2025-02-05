@@ -46,7 +46,6 @@ public class CartController extends BaseController {
     }
 
     @GetMapping()
-    @PreAuthorize("hasAuthority('customer')")
     public ResponseEntity<CartListingDto> getMyCart(@AuthenticationPrincipal UserDetails userDetails) {
         GetMyCartQuery getMyCartQuery = new GetMyCartQuery(UUID.fromString(userDetails.getUsername()));
         return ResponseEntity.ok(getMyCartQuery.execute(pipeline));

@@ -11,5 +11,5 @@ public interface CartService {
     List<Cart> getAll();
     void resetCart(Integer cartId);
     boolean existsById(Integer id);
-    int getCartIdByUserId(UUID userId);
+    Cart getCartByCustomerId(UUID customerId);
 }

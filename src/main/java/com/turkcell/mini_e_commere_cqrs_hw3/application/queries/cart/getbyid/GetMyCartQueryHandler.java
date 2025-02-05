@@ -18,6 +18,6 @@ public class GetMyCartQueryHandler implements Command.Handler<GetMyCartQuery, Ca
     @Override
     public CartListingDto handle(GetMyCartQuery getMyCartQuery) {
         userBusinessRules.idMustExist(getMyCartQuery.userId());
-        return modelMapper.map(cartService.getCartIdByUserId(getMyCartQuery.userId()), CartListingDto.class);
+        return modelMapper.map(cartService.getCartByCustomerId(getMyCartQuery.userId()), CartListingDto.class);
     }
 }
